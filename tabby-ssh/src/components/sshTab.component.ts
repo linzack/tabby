@@ -176,11 +176,15 @@ export class SSHTabComponent extends ConnectableTerminalTabComponent<SSHProfile>
 
     async initializeSession (): Promise<void> {
         await super.initializeSession()
+        this.logger.info('initializeSession: starting multiplexed attempt')
         try {
             await this.initializeSessionMaybeMultiplex(true)
+            this.logger.info('initializeSession: multiplexed attempt succeeded')
         } catch {
             try {
+                this.logger.warn('initializeSession: multiplexed attempt failed, starting non-multiplexed fallback...')
                 await this.initializeSessionMaybeMultiplex(false)
+                this.logger.info('initializeSession: non-multiplexed fallback succeeded')
             } catch (e) {
                 console.error('SSH session initialization failed', e)
                 this.write(colors.black.bgRed(' X ') + ' ' + colors.red(e.message) + '\r\n')

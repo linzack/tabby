@@ -107,6 +107,8 @@ export class SSHSession {
     activePrivateKey: russh.KeyPair|null = null
     authUsername: string|null = null
 
+    private static sessionCounter = 0
+    sessionId = ++SSHSession.sessionCounter
     open = false
 
     private logger: Logger
@@ -132,6 +134,7 @@ export class SSHSession {
         public profile: SSHProfile,
     ) {
         this.logger = injector.get(LogService).create(`ssh-${profile.options.host}-${profile.options.port}`)
+        this.logger.info(`[SSHSession #${this.sessionId}] Instance created`)
 
         this.passwordStorage = injector.get(PasswordStorageService)
         this.ngbModal = injector.get(NgbModal)
@@ -845,7 +848,7 @@ export class SSHSession {
     }
 
     async destroy (): Promise<void> {
-        this.logger.info('Destroying')
+        this.logger.info(`[SSHSession #${this.sessionId}] Destroying`)
         this.willDestroy.next()
         this.willDestroy.complete()
         this.serviceMessage.complete()
